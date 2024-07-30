@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "soccer-spa": {
+    "soccer-priority-pass-spa-nssr": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -59,10 +59,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "soccer-spa:build:production"
+              "buildTarget": "soccer-priority-pass-spa-nssr:build:production"
             },
             "development": {
-              "buildTarget": "soccer-spa:build:development"
+              "buildTarget": "soccer-priority-pass-spa-nssr:build:development"
             }
           },
           "defaultConfiguration": "development"
