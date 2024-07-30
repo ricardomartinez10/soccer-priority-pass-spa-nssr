@@ -1,0 +1,23 @@
+<div class="player-form-container">
+    <hr>
+    <h2>Crear Jugador</h2>
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+        <p>
+            <label for="first-name">Nombre y Apellido: </label>
+            <input id="first-name" type="text" formControlName="name">
+        </p>
+        <p>
+            <label for="last-name">Email: </label>
+            <input id="last-name" type="email" formControlName="email">
+        </p>
+        <p>
+            <label for="last-name">Position: </label>
+            <input id="last-name" type="text" formControlName="position">
+        </p>
+        <p>
+            <label for="last-name">Assists: </label>
+            <input id="last-name" type="text" formControlName="assists">
+        </p>
+        <button type="submit" [disabled]="!profileForm.valid">Submit</button>
+      </form>
+</div>
