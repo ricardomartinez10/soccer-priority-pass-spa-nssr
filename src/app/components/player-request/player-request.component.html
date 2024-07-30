@@ -3,29 +3,25 @@
         <hr>
         <div *ngIf="closeForm" class="form-closed">Fomulario cerrado</div>
         <form *ngIf="!closeForm" [formGroup]="playerRequestForm" (ngSubmit)="onSubmitRequest($event)">
-            <h3>Inscribirse para el próximo partido</h3>
-            <div class="counter-container">
+            <h3>Incripción para el próximo partido</h3>
+            <div class="counter-container mb-3">
                 <span>Tiempo restante: </span>
-                <countdown [config]="{leftTime: 3600}" (event)="handleEvent($event)"></countdown>
-            </div>
-            <div class="mb-3">
-              <label for="name" class="form-label">Nombre</label>
-              <input type="text" formControlName="name" class="form-control" id="name">
+                <countdown *ngIf="diffInSecs" [config]="{leftTime: diffInSecs, format: dateFormat }" (event)="handleEvent($event)"></countdown>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" formControlName="email" class="form-control" id="email">
             </div>
             <div class="mb-3">
-                <label for="repeatEmail" class="form-label">Email</label>
+                <label for="repeatEmail" class="form-label">Confirmar email</label>
                 <input type="email" formControlName="repeatEmail" class="form-control" id="repeatEmail">
             </div>
             <div class="alert alert-warning" *ngIf="playerRequestForm.controls['email'].errors && playerRequestForm.controls['email'].hasError('email')">El email debe tener un formato valido</div>
             <div class="alert alert-warning" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('email')">La confirmación del correo debe tener un formato valido</div>
             <div class="alert alert-warning" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('notEqual')">Ambos correos deben coincidir</div>
-            <div class="alert alert-danger" *ngIf="playerAlreadySubscribed">El jugador ya se encuentra inscrito para el proximo partido</div>
-            <div class="alert alert-success" *ngIf="playerSuccessfullySubscribed">El jugador ha inscrito exitosamente</div>
-            <button type="submit" class="btn btn-success" [disabled]="!playerRequestForm.valid">Enviar</button>
+            <div class="alert alert-danger" *ngIf="playerAlreadySubscribed">El jugador ya se encuentra inscrito para el próximo partido</div>
+            <div class="alert alert-success" *ngIf="playerSuccessfullySubscribed">El jugador se ha inscrito exitosamente</div>
+            <button type="submit" class="btn btn-success" [disabled]="!playerRequestForm.valid || loadingRequest">Enviar</button>
         </form>  
     </div>
       <hr>

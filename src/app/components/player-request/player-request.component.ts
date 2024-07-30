@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { equivalentValidator } from '../validators/equivalent-validator';
 import { Player } from '../../interfaces/player.interface';
 import { CountdownComponent, CountdownEvent, CountdownModule } from 'ngx-countdown';
+import moment, { Moment } from 'moment';
 
 @Component({
   selector: 'app-player-request',
@@ -24,16 +25,19 @@ export class PlayerRequestComponent implements OnInit {
   private playerSevice: PlayerService = inject(PlayerService);
   subscribedPlayers: Array<Player> = [];
   subscribedKeepers: Array<Player> = [];
-  maxPlayers = 3;
+  maxPlayers = 18;
   maxKeepers = 2;
   loadingRequest: boolean = false;
   playerAlreadySubscribed = false;
   playerSuccessfullySubscribed = false;
   closeForm = false;
+  formCloseDate?: Moment;
+  now?: Moment;
+  diffInSecs?:number
+  dateFormat?: string;
 
   playerRequestForm = new FormGroup(
     {
-      name: new FormControl('', Validators.required),
       email: new FormControl(
         '',
         Validators.compose([Validators.required, Validators.email])
@@ -49,12 +53,21 @@ export class PlayerRequestComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.setFormTime();
     this.getSubscribedPlayers();
   }
 
+  setFormTime() {
+    this.formCloseDate = moment('31/07/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
+    //this.formCloseDate = moment('30/07/2024 16:33:00', "DD/MM/YYYY HH:mm:ss");
+    this.now = moment();
+    this.diffInSecs = this.formCloseDate.diff(this.now, 'seconds');
+    this.dateFormat = this.diffInSecs < 86400 ?
+      'HH:mm:ss' :
+      'd:HH:m:s'
+  }
+
   handleEvent(e: CountdownEvent) {
-    console.log(e);
-    
     if (e.action === 'done') {
       this.closeForm = true;
     }
@@ -71,8 +84,8 @@ export class PlayerRequestComponent implements OnInit {
 
   onSubmitRequest(event: Event) {
     event.preventDefault();
+    this.loadingRequest = true;
     const playerRequest: PlayerRequest = {
-      name: this.playerRequestForm.controls['name'].value || '',
       email: this.playerRequestForm.controls['email'].value || '',
     };
 
@@ -88,6 +101,7 @@ export class PlayerRequestComponent implements OnInit {
             console.log('Finished uploading!');
             this.playerSuccessfullySubscribed = true;
             this.playerRequestForm.reset();
+            this.loadingRequest = false;
             this.getSubscribedPlayers();
 
             setTimeout(() => {
@@ -100,6 +114,7 @@ export class PlayerRequestComponent implements OnInit {
         if (error.status == 409) {
           this.playerAlreadySubscribed = true;
           this.playerRequestForm.reset();
+          this.loadingRequest = false;
 
           setTimeout(() => {
             this.playerAlreadySubscribed = false;
