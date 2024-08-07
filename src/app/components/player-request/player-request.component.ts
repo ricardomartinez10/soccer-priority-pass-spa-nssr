@@ -58,7 +58,7 @@ export class PlayerRequestComponent implements OnInit {
   }
 
   setFormTime() {
-    this.formCloseDate = moment('06/08/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
+    this.formCloseDate = moment('07/08/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
     this.now = moment();
     this.diffInSecs = this.formCloseDate.diff(this.now, 'seconds');
     this.dateFormat = this.diffInSecs < 86400 ?
@@ -128,6 +128,7 @@ export class PlayerRequestComponent implements OnInit {
             this.playerSuccessfullySubscribed = true;
             this.playerRequestForm.reset();
             this.loadingRequest = false;
+            this.getSubscribedPlayers();
 
             setTimeout(() => {
               this.playerSuccessfullySubscribed = false;
