@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -19,7 +19,7 @@ import moment, { Moment } from 'moment';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, CountdownModule, CountdownComponent],
   templateUrl: './player-request.component.html',
-  styleUrl: './player-request.component.sass',
+  styleUrl: './player-request.component.scss',
 })
 export class PlayerRequestComponent implements OnInit {
   private playerSevice: PlayerService = inject(PlayerService);
@@ -30,7 +30,7 @@ export class PlayerRequestComponent implements OnInit {
   loadingRequest: boolean = false;
   playerAlreadySubscribed = false;
   playerSuccessfullySubscribed = false;
-  closeForm = false;
+  closeForm = signal(false);
   formCloseDate?: Moment;
   now?: Moment;
   diffInSecs?:number
@@ -58,8 +58,7 @@ export class PlayerRequestComponent implements OnInit {
   }
 
   setFormTime() {
-    this.formCloseDate = moment('31/07/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
-    //this.formCloseDate = moment('30/07/2024 16:33:00', "DD/MM/YYYY HH:mm:ss");
+    this.formCloseDate = moment('07/08/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
     this.now = moment();
     this.diffInSecs = this.formCloseDate.diff(this.now, 'seconds');
     this.dateFormat = this.diffInSecs < 86400 ?
@@ -69,8 +68,15 @@ export class PlayerRequestComponent implements OnInit {
 
   handleEvent(e: CountdownEvent) {
     if (e.action === 'done') {
-      this.closeForm = true;
+      this.closeForm.set(true);
     }
+  }
+
+  getConfirmedPlayersEmail(): Array<String> {
+    return this.subscribedKeepers
+      .concat(this.subscribedPlayers)
+      .slice(0, this.maxKeepers + this.maxPlayers)
+      .map(player => player.email);
   }
 
   getSubscribedPlayers() {
@@ -80,6 +86,30 @@ export class PlayerRequestComponent implements OnInit {
         this.subscribedKeepers = players.priorityKeepers;
       },
     });
+  }
+
+  updateConfirmedPlayers() {
+    this.playerSevice.updateConfirmedPlayers(this.getConfirmedPlayersEmail()).subscribe({
+      next: (response ) => {
+        console.log('successfull', response);
+      },
+      error: (error) => {
+        console.log('erorr', error);
+
+      }
+    })
+  }
+
+  updatePlayerAssists() {
+    this.playerSevice.updatePlayerAssists().subscribe({
+      next: (response ) => {
+        console.log('successfull', response);
+      },
+      error: (error) => {
+        console.log('erorr', error);
+
+      }
+    })
   }
 
   onSubmitRequest(event: Event) {
@@ -93,16 +123,11 @@ export class PlayerRequestComponent implements OnInit {
       next: (event) => {
         switch (event.type) {
           case HttpEventType.UploadProgress:
-            console.log(
-              'Uploaded ' + event.loaded + ' out of ' + event.total + ' bytes'
-            );
             break;
           case HttpEventType.Response:
-            console.log('Finished uploading!');
             this.playerSuccessfullySubscribed = true;
             this.playerRequestForm.reset();
             this.loadingRequest = false;
-            this.getSubscribedPlayers();
 
             setTimeout(() => {
               this.playerSuccessfullySubscribed = false;

@@ -9,7 +9,7 @@ import { HttpEventType } from '@angular/common/http';
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './player-form.component.html',
-  styleUrl: './player-form.component.sass'
+  styleUrl: './player-form.component.scss'
 })
 export class PlayerFormComponent implements OnInit{
   private playerService: PlayerService = inject(PlayerService);

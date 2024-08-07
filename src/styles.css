@@ -1,1 +1,52 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary-color: #1E5631;
+    --secondary-color: #08a045;
+    --ternary-color: #0a261d;
+    --text-primary: white;
+}
+
+body {
+    background-color: var(--primary-color);
+}
+
+* {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 400;
+    font-style: var(--text-primary);
+}
+
+.text-primary {
+    color: white;
+}
+
+.main-bg-color {
+    background-color: var(--secondary-color);
+}
+
+.secondary-bg-color {
+    background-color: var(--ternary-color);
+}
+
+.oxygen-light {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+  
+  .oxygen-regular {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .oxygen-bold {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  

@@ -15,6 +15,9 @@ export class PlayerService {
   createPlayerUrl = `${this.baseUrl}/create-player`;
   playerRequestUrl = `${this.baseUrl}/player-request`;
   subscribedPlayers = `${this.baseUrl}/player-request`;
+  updateConfirmedPlayersUrl = `${this.baseUrl}/update-player-confirmed`;
+  updatePlayerAssistsUrl = `${this.baseUrl}/update-player-assists`;
+
 
   constructor(private http: HttpClient) { }
 
@@ -25,6 +28,18 @@ export class PlayerService {
   getSusbscribedPlayers() {
     return this.http.get<PlayerRequestResponse>(this.subscribedPlayers);
   }
+
+  updateConfirmedPlayers(confirmedPlayers: Array<String>) {
+    return this.http.put<[String]>(this.updateConfirmedPlayersUrl, confirmedPlayers , {
+      observe: 'events'
+    });
+  };
+
+  updatePlayerAssists() {
+    return this.http.put<[String]>(this.updatePlayerAssistsUrl, {
+      observe: 'events'
+    });
+  };
 
   createPlayer(player: Player) {
     return this.http.post<Player>(this.createPlayerUrl, player, {

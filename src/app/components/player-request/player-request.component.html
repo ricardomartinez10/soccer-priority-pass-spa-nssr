@@ -1,54 +1,58 @@
 <div class="player-request-container">
     <div class="subscription-form-container">
         <hr>
-        <div *ngIf="closeForm" class="form-closed">Fomulario cerrado</div>
-        <form *ngIf="!closeForm" [formGroup]="playerRequestForm" (ngSubmit)="onSubmitRequest($event)">
-            <h3>Incripción para el próximo partido</h3>
-            <div class="counter-container mb-3">
-                <span>Tiempo restante: </span>
-                <countdown *ngIf="diffInSecs" [config]="{leftTime: diffInSecs, format: dateFormat }" (event)="handleEvent($event)"></countdown>
+        <div *ngIf="closeForm()" class="py-4 text-primary">Fomulario cerrado</div>
+        <form *ngIf="!closeForm()" [formGroup]="playerRequestForm" (ngSubmit)="onSubmitRequest($event)">
+            <h3 class="text-primary text-lg oxygen-bold my-4">Incripción para el próximo partido</h3>
+            <div class="counter-container mb-3 text-right">
+                <span class="text-primary">Tiempo restante: </span>
+                <countdown class="text-primary text-left" *ngIf="diffInSecs" [config]="{leftTime: diffInSecs, format: dateFormat }" (event)="handleEvent($event)"></countdown>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" formControlName="email" class="form-control" id="email">
+                <label for="email" class="block mb-1 text-primary">Email:</label>
+                <input type="email" formControlName="email" class="block w-full rounded-md border-0 py-1.5 focus:ring-2 sm:text-sm sm:leading-6 [text-indent:5px]" id="email">
             </div>
             <div class="mb-3">
-                <label for="repeatEmail" class="form-label">Confirmar email</label>
-                <input type="email" formControlName="repeatEmail" class="form-control" id="repeatEmail">
+                <label for="repeatEmail" class="block mb-1 text-primary">Confirmar email:</label>
+                <input type="email" formControlName="repeatEmail" class="block w-full rounded-md border-0 py-1.5 focus:ring-2 sm:text-sm sm:leading-6 [text-indent:5px]" id="repeatEmail">
             </div>
-            <div class="alert alert-warning" *ngIf="playerRequestForm.controls['email'].errors && playerRequestForm.controls['email'].hasError('email')">El email debe tener un formato valido</div>
-            <div class="alert alert-warning" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('email')">La confirmación del correo debe tener un formato valido</div>
-            <div class="alert alert-warning" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('notEqual')">Ambos correos deben coincidir</div>
-            <div class="alert alert-danger" *ngIf="playerAlreadySubscribed">El jugador ya se encuentra inscrito para el próximo partido</div>
-            <div class="alert alert-success" *ngIf="playerSuccessfullySubscribed">El jugador se ha inscrito exitosamente</div>
-            <button type="submit" class="btn btn-success" [disabled]="!playerRequestForm.valid || loadingRequest">Enviar</button>
+            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['email'].errors && playerRequestForm.controls['email'].hasError('email')">El email debe tener un formato valido</div>
+            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4"*ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('email')">La confirmación del correo debe tener un formato valido</div>
+            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('notEqual')">Ambos correos deben coincidir</div>
+            <div class="bg-red-700 mb-2 text-primary rounded py-2 px-4" *ngIf="playerAlreadySubscribed">El jugador ya se encuentra inscrito para el próximo partido</div>
+            <div class="bg-lime-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerSuccessfullySubscribed">El jugador se ha inscrito exitosamente</div>
+            <button type="submit" class="form-button py-2 px-4 rounded mb-4 text-primary oxygen-bold main-bg-color hover:bg-green-600" [disabled]="!playerRequestForm.valid || loadingRequest">Enviar</button>
         </form>  
     </div>
       <hr>
-      <h3 class="mt-4">Lista inscritos para el próximo partido</h3>
-      <div class="indicators-container">
-        <div class="indicator-item">
-            <span class="mr-4 d-inline">Confirmado</span>
-            <span class="indicator-item-confirm"></span>
-        </div>
-        <div class="indicator-item">
-            <span>En espera</span>
-            <span class="indicator-item-wait"></span>
+      <h3 class="mt-4 mb-4 text-white text-lg oxygen-bold">Lista inscritos para el próximo partido</h3>
+      <div class="flex justify-end items-center text-primary text-sm">
+            <span class="mr-1 items-center d-inline">Confirmado</span>
+            <span class="block rounded w-[55px] h-[20px] main-bg-color"></span>
+        <div class="flex justify-end items-center text-primary text-sm ml-2">
+            <span class="mr-1 items-center d-inline">En espera</span>
+            <span class="block rounded w-[55px] h-[20px] secondary-bg-color"></span>
         </div>
       </div>
       <div class="player-request-container-list mb-4 mt-3">
-        <h4>Arqueros</h4>
+        <h4 class="mt-4 oxygen-bold text-lg text-primary mb-3 text-primary">Arqueros</h4>
         <ol class="list-group">
-            <li class="list-group-item" [ngClass]="i < maxKeepers ? 'confirmed' : 'wait'" *ngFor="let player of subscribedKeepers; index as i">
-              <span class="mr-4">{{i +1}}  {{ player.name }}</span>
-              <span class="assists">Asistencias {{player.assists}}</span>
+            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxKeepers ? 'main-bg-color' : 'secondary-bg-color'" *ngFor="let player of subscribedKeepers; index as i">
+                <div>
+                    <span class="mr-4">{{i +1}}</span>
+                    <span>{{ player.name }}</span>
+                </div>
+              <span class="text-xs assists oxygen-regular">Asistencias {{player.assists}}</span>
             </li>
         </ol>
-        <h4 class="mt-4">Jugadores</h4>
+        <h4 class="mt-4 oxygen-bold text-lg text-primary mb-3">Jugadores</h4>
         <ol class="list-group">
-            <li class="list-group-item" [ngClass]="i < maxPlayers ? 'confirmed' : 'wait'"  *ngFor="let player of subscribedPlayers; index as i">
-              <span class="mr-3">{{i +1}} {{ player.name }}</span> 
-              <span class="assists">Asistencias {{player.assists}}</span>
+            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxPlayers ? 'main-bg-color' : 'secondary-bg-color'"  *ngFor="let player of subscribedPlayers; index as i">
+                <div>
+                    <span class="mr-4">{{i +1}}</span>
+                    <span>{{ player.name }}</span>
+                </div>
+              <span class="text-xs assists oxygen-regular ">Asistencias {{player.assists}}</span>
             </li>
         </ol>
       </div>

@@ -8,7 +8,7 @@ import { PlayerRequestComponent } from './components/player-request/player-reque
   standalone: true,
   imports: [RouterOutlet, PlayerFormComponent, PlayerRequestComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.sass'
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'soccer-squad-spa';
