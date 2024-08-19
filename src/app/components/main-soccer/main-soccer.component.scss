@@ -1,0 +1,26 @@
+.soccer-title {
+    font-size: 30px;
+}
+
+/* The animation code */
+@keyframes soccer-ball-keyframes {
+    from {
+        left: 0;
+        transform: rotate(0deg);
+    }
+    to {
+        left: calc(52%);
+        transform: rotate(360deg);
+    }
+  }
+  
+/* The element to apply the animation to */
+.soccer-icon {
+    position: relative;
+
+}
+
+.soccer-animation {
+    animation-name: soccer-ball-keyframes;
+    animation-duration: 4s;
+}

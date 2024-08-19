@@ -1,0 +1,14 @@
+<div class="login-container">
+    <h1 class="text-white text-3xl">Login</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="onLogginSubmitRequest($event)">
+        <div class="mb-3 mt-4">
+            <label for="user" class="block mb-1 text-primary">User:</label>
+            <input type="text" formControlName="user" class="block rounded-md border-0 py-1.5 focus:ring-2 sm:text-sm sm:leading-6 [text-indent:5px]" id="user">
+        </div>
+        <div class="mb-3">
+            <label for="password" class="block mb-1 text-primary">Password:</label>
+            <input type="password" formControlName="password" class="block rounded-md border-0 py-1.5 focus:ring-2 sm:text-sm sm:leading-6 [text-indent:5px]" id="password">
+        </div>
+        <button type="submit" class="form-button py-2 px-4 rounded mb-4 text-primary oxygen-bold main-bg-color hover:bg-green-600" [disabled]="!loginForm.valid">Enviar</button>
+    </form>  
+</div>

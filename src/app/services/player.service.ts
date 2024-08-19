@@ -4,6 +4,7 @@ import { Player } from '../interfaces/player.interface';
 import { PlayerRequest } from '../interfaces/player-request.interface';
 import { Observable } from 'rxjs';
 import { PlayerRequestResponse } from '../interfaces/player-request-response';
+import { Game } from '../interfaces/game.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -11,12 +12,14 @@ import { PlayerRequestResponse } from '../interfaces/player-request-response';
 export class PlayerService {
   //baseUrl = 'http://localhost:3000';
   baseUrl = 'https://soccer-priority-pass-back.onrender.com';
-  getPlayersUrl = `${this.baseUrl}/players`;
-  createPlayerUrl = `${this.baseUrl}/create-player`;
-  playerRequestUrl = `${this.baseUrl}/player-request`;
-  subscribedPlayers = `${this.baseUrl}/player-request`;
-  updateConfirmedPlayersUrl = `${this.baseUrl}/update-player-confirmed`;
-  updatePlayerAssistsUrl = `${this.baseUrl}/update-player-assists`;
+  private getPlayersUrl = `${this.baseUrl}/players`;
+  private createPlayerUrl = `${this.baseUrl}/create-player`;
+  private playerRequestUrl = `${this.baseUrl}/player-request`;
+  private subscribedPlayers = `${this.baseUrl}/player-request`;
+  private updateConfirmedPlayersUrl = `${this.baseUrl}/update-player-confirmed`;
+  private updatePlayerAssistsUrl = `${this.baseUrl}/update-player-assists`;
+  private getGameDetailsUrl = `${this.baseUrl}/game-details`;
+  private updateGameDateUrl = `${this.baseUrl}/update-game-date`;
 
 
   constructor(private http: HttpClient) { }
@@ -40,6 +43,16 @@ export class PlayerService {
       observe: 'events'
     });
   };
+
+  getGameDetails() {
+    return this.http.get<Game>(this.getGameDetailsUrl);
+  }
+
+  updateGameDate(date: Game) {
+    return this.http.post<Game>(this.updateGameDateUrl, date, {
+      observe: 'events'
+    });
+  }
 
   createPlayer(player: Player) {
     return this.http.post<Player>(this.createPlayerUrl, player, {

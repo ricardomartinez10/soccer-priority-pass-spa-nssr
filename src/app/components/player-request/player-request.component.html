@@ -6,7 +6,7 @@
             <h3 class="text-primary text-lg oxygen-bold my-4">Incripción para el próximo partido</h3>
             <div class="counter-container mb-3 text-right">
                 <span class="text-primary">Tiempo restante: </span>
-                <countdown class="text-primary text-left" *ngIf="diffInSecs" [config]="{leftTime: diffInSecs, format: dateFormat }" (event)="handleEvent($event)"></countdown>
+                <countdown class="text-primary text-left" *ngIf="diffInSecs()" [config]="{leftTime: diffInSecs(), format: dateFormat }" (event)="handleEvent($event)"></countdown>
             </div>
             <div class="mb-3">
                 <label for="email" class="block mb-1 text-primary">Email:</label>
@@ -19,9 +19,9 @@
             <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['email'].errors && playerRequestForm.controls['email'].hasError('email')">El email debe tener un formato valido</div>
             <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4"*ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('email')">La confirmación del correo debe tener un formato valido</div>
             <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('notEqual')">Ambos correos deben coincidir</div>
-            <div class="bg-red-700 mb-2 text-primary rounded py-2 px-4" *ngIf="playerAlreadySubscribed">El jugador ya se encuentra inscrito para el próximo partido</div>
-            <div class="bg-lime-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerSuccessfullySubscribed">El jugador se ha inscrito exitosamente</div>
-            <button type="submit" class="form-button py-2 px-4 rounded mb-4 text-primary oxygen-bold main-bg-color hover:bg-green-600" [disabled]="!playerRequestForm.valid || loadingRequest">Enviar</button>
+            <div class="bg-red-700 mb-2 text-primary rounded py-2 px-4" *ngIf="playerAlreadySubscribed()">El jugador ya se encuentra inscrito para el próximo partido</div>
+            <div class="bg-lime-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerSuccessfullySubscribed()">El jugador se ha inscrito exitosamente</div>
+            <button type="submit" class="form-button py-2 px-4 rounded mb-4 text-primary oxygen-bold main-bg-color hover:bg-green-600" [disabled]="!playerRequestForm.valid || loadingRequest()">Enviar</button>
         </form>  
     </div>
       <hr>
@@ -37,7 +37,7 @@
       <div class="player-request-container-list mb-4 mt-3">
         <h4 class="mt-4 oxygen-bold text-lg text-primary mb-3 text-primary">Arqueros</h4>
         <ol class="list-group">
-            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxKeepers ? 'main-bg-color' : 'secondary-bg-color'" *ngFor="let player of subscribedKeepers; index as i">
+            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxKeepers ? 'main-bg-color' : 'secondary-bg-color'" *ngFor="let player of subscribedKeepers(); index as i">
                 <div>
                     <span class="mr-4">{{i +1}}</span>
                     <span>{{ player.name }}</span>
@@ -47,7 +47,7 @@
         </ol>
         <h4 class="mt-4 oxygen-bold text-lg text-primary mb-3">Jugadores</h4>
         <ol class="list-group">
-            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxPlayers ? 'main-bg-color' : 'secondary-bg-color'"  *ngFor="let player of subscribedPlayers; index as i">
+            <li class="flex justify-between items-center rounded py-4 px-5 mb-2 list-group-item text-primary" [ngClass]="i < maxPlayers ? 'main-bg-color' : 'secondary-bg-color'"  *ngFor="let player of subscribedPlayers(); index as i">
                 <div>
                     <span class="mr-4">{{i +1}}</span>
                     <span>{{ player.name }}</span>

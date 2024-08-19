@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output, signal, WritableSignal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -13,6 +13,7 @@ import { equivalentValidator } from '../validators/equivalent-validator';
 import { Player } from '../../interfaces/player.interface';
 import { CountdownComponent, CountdownEvent, CountdownModule } from 'ngx-countdown';
 import moment, { Moment } from 'moment';
+import { Game } from '../../interfaces/game.interface';
 
 @Component({
   selector: 'app-player-request',
@@ -23,17 +24,18 @@ import moment, { Moment } from 'moment';
 })
 export class PlayerRequestComponent implements OnInit {
   private playerSevice: PlayerService = inject(PlayerService);
-  subscribedPlayers: Array<Player> = [];
-  subscribedKeepers: Array<Player> = [];
+  subscribedPlayers: WritableSignal<Array<Player>> = signal([]); 
+  subscribedKeepers: WritableSignal<Array<Player>> = signal([]);
+  @Output() initSoccerballAnimation = new EventEmitter<boolean>();
   maxPlayers = 18;
   maxKeepers = 2;
-  loadingRequest: boolean = false;
-  playerAlreadySubscribed = false;
-  playerSuccessfullySubscribed = false;
+  loadingRequest: WritableSignal<boolean> = signal(false);
+  playerAlreadySubscribed: WritableSignal<boolean> = signal(false);
+  playerSuccessfullySubscribed: WritableSignal<boolean> = signal(false);;
   closeForm = signal(false);
   formCloseDate?: Moment;
   now?: Moment;
-  diffInSecs?:number
+  diffInSecs: WritableSignal<number> = signal(0);
   dateFormat?: string;
 
   playerRequestForm = new FormGroup(
@@ -53,15 +55,15 @@ export class PlayerRequestComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    this.setFormTime();
+    this.getGameDetails();
     this.getSubscribedPlayers();
   }
 
-  setFormTime() {
-    this.formCloseDate = moment('14/08/2024 19:00:00', "DD/MM/YYYY HH:mm:ss");
+  setFormTime(date: string, dateFormat: string) {
+    this.formCloseDate = moment(date, dateFormat);
     this.now = moment();
-    this.diffInSecs = this.formCloseDate.diff(this.now, 'seconds');
-    this.dateFormat = this.diffInSecs < 86400 ?
+    this.diffInSecs?.set(this.formCloseDate.diff(this.now, 'seconds'));
+    this.dateFormat = this.diffInSecs() < 86400 ?
       'HH:mm:ss' :
       'd:HH:m:s'
   }
@@ -73,8 +75,8 @@ export class PlayerRequestComponent implements OnInit {
   }
 
   getConfirmedPlayersEmail(): Array<String> {
-    return this.subscribedKeepers
-      .concat(this.subscribedPlayers)
+    return this.subscribedKeepers()
+      .concat(this.subscribedPlayers())
       .slice(0, this.maxKeepers + this.maxPlayers)
       .map(player => player.email);
   }
@@ -82,10 +84,18 @@ export class PlayerRequestComponent implements OnInit {
   getSubscribedPlayers() {
     this.playerSevice.getSusbscribedPlayers().subscribe({
       next: (players) => {        
-        this.subscribedPlayers = players.priorityPlayers;
-        this.subscribedKeepers = players.priorityKeepers;
+        this.subscribedPlayers.set(players.priorityPlayers);
+        this.subscribedKeepers.set(players.priorityKeepers);
       },
     });
+  }
+
+  getGameDetails() {
+    this.playerSevice.getGameDetails().subscribe({
+      next: (details: Game) => {
+        this.setFormTime(details.date, details.dateFormat || '');
+      }
+    })
   }
 
   updateConfirmedPlayers() {
@@ -114,7 +124,7 @@ export class PlayerRequestComponent implements OnInit {
 
   onSubmitRequest(event: Event) {
     event.preventDefault();
-    this.loadingRequest = true;
+    this.loadingRequest.set(true);
     const playerRequest: PlayerRequest = {
       email: this.playerRequestForm.controls['email'].value || '',
     };
@@ -125,25 +135,26 @@ export class PlayerRequestComponent implements OnInit {
           case HttpEventType.UploadProgress:
             break;
           case HttpEventType.Response:
-            this.playerSuccessfullySubscribed = true;
+            this.initSoccerballAnimation.emit(true);
+            this.playerSuccessfullySubscribed.set(true);
             this.playerRequestForm.reset();
-            this.loadingRequest = false;
+            this.loadingRequest.set(false);
             this.getSubscribedPlayers();
 
             setTimeout(() => {
-              this.playerSuccessfullySubscribed = false;
+              this.playerSuccessfullySubscribed.set(false);
             }, 2000);
             break;
         }
       },
       error: (error: HttpErrorResponse) => {
         if (error.status == 409) {
-          this.playerAlreadySubscribed = true;
+          this.playerAlreadySubscribed.set(true);
           this.playerRequestForm.reset();
-          this.loadingRequest = false;
+          this.loadingRequest.set(false);
 
           setTimeout(() => {
-            this.playerAlreadySubscribed = false;
+            this.playerAlreadySubscribed.set(false);
           }, 2000);
         }
       },
