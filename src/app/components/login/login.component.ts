@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit{
         };
       } else {
         this.popOverInfo = {
-          text: 'User unauthorized 2',
+          text: 'User unauthorized',
           type: 'error',
           show: true && this.loginForm.touched
         };
