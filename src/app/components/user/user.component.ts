@@ -4,16 +4,23 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { PlayerService } from '../../services/player.service';
 import { HttpEventType } from '@angular/common/http';
 import { Game } from '../../interfaces/game.interface';
+import { of } from 'rxjs';
+import { AlertSoccerComponent } from '../alert-soccer/alert-soccer.component';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [AlertSoccerComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
 })
 export class UserComponent {
   playerService = inject(PlayerService);
+  popOverInfo = {
+    text: 'Game and player status updated!',
+    type: 'success',
+    show: false
+  }
   gameForm = new FormGroup(
     {
       date: new FormControl(
@@ -33,13 +40,18 @@ export class UserComponent {
       next: (event) => {
         switch(event.type) {
           case HttpEventType.Response:
-            console.log(event.body);
+            this.popOverInfo.show = true;
+            this.gameForm.reset();
+
+            setTimeout(() => {
+              this.popOverInfo.show = false;
+            }, 3000);
           break;
         }
       },
       error: () => {
 
       }
-    })
+    });
   }
 }
