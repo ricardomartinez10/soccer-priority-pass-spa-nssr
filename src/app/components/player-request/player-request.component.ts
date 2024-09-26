@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output, signal, WritableSignal } from '@angular/core';
+import { Component, effect, EventEmitter, inject, OnInit, Output, signal, WritableSignal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -14,11 +14,12 @@ import { Player } from '../../interfaces/player.interface';
 import { CountdownComponent, CountdownEvent, CountdownModule } from 'ngx-countdown';
 import moment, { Moment } from 'moment';
 import { Game } from '../../interfaces/game.interface';
+import { AlertSoccerComponent } from '../alert-soccer/alert-soccer.component';
 
 @Component({
   selector: 'app-player-request',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CountdownModule, CountdownComponent],
+  imports: [AlertSoccerComponent,CommonModule, ReactiveFormsModule, CountdownModule, CountdownComponent],
   templateUrl: './player-request.component.html',
   styleUrl: './player-request.component.scss',
 })
@@ -37,6 +38,7 @@ export class PlayerRequestComponent implements OnInit {
   now?: Moment;
   diffInSecs: WritableSignal<number> = signal(0);
   dateFormat?: string;
+  formAlerts?:Array<any>;
 
   playerRequestForm = new FormGroup(
     {
@@ -54,9 +56,20 @@ export class PlayerRequestComponent implements OnInit {
     }
   );
 
+  constructor() {
+    effect(() => {
+      this.setUpFormAlerts();
+    });
+  }
+
   ngOnInit(): void {
+    this.setUpFormAlerts();
     this.getGameDetails();
     this.getSubscribedPlayers();
+
+    this.playerRequestForm.valueChanges.subscribe(() => {
+      this.setUpFormAlerts();
+    });
   }
 
   setFormTime(date: string, dateFormat: string) {
@@ -72,6 +85,36 @@ export class PlayerRequestComponent implements OnInit {
     if (e.action === 'done') {
       this.closeForm.set(true);
     }
+  }
+
+  setUpFormAlerts() {
+    this.formAlerts = [
+      {
+        text: 'El email debe tener un formato valido',
+        type: 'alert',
+        validator: this.playerRequestForm.controls['email'].errors && this.playerRequestForm.controls['email'].hasError('email')
+      },
+      {
+        text: 'La confirmación del correo debe tener un formato valido',
+        type: 'alert',
+        validator: this.playerRequestForm.controls['repeatEmail'].errors && this.playerRequestForm.controls['repeatEmail'].hasError('email')
+      },
+      {
+        text: 'Ambos correos deben coincidir',
+        type: 'alert',
+        validator: this.playerRequestForm.controls['repeatEmail'].errors && this.playerRequestForm.controls['repeatEmail'].hasError('notEqual')
+      },
+      {
+        text: 'El jugador ya se encuentra inscrito para el próximo partido',
+        type: 'error',
+        validator: this.playerAlreadySubscribed()
+      },
+      {
+        text: 'El jugador se ha inscrito exitosamente',
+        type: 'success',
+        validator: this.playerSuccessfullySubscribed()
+      }
+    ]
   }
 
   getConfirmedPlayersEmail(): Array<String> {

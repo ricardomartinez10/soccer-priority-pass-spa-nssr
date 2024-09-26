@@ -16,11 +16,7 @@
                 <label for="repeatEmail" class="block mb-1 text-primary">Confirmar email:</label>
                 <input type="email" formControlName="repeatEmail" class="block w-full rounded-md border-0 py-1.5 focus:ring-2 sm:text-sm sm:leading-6 [text-indent:5px]" id="repeatEmail">
             </div>
-            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['email'].errors && playerRequestForm.controls['email'].hasError('email')">El email debe tener un formato valido</div>
-            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4"*ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('email')">La confirmación del correo debe tener un formato valido</div>
-            <div class="bg-amber-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerRequestForm.controls['repeatEmail'].errors && playerRequestForm.controls['repeatEmail'].hasError('notEqual')">Ambos correos deben coincidir</div>
-            <div class="bg-red-700 mb-2 text-primary rounded py-2 px-4" *ngIf="playerAlreadySubscribed()">El jugador ya se encuentra inscrito para el próximo partido</div>
-            <div class="bg-lime-600 mb-2 text-primary rounded py-2 px-4" *ngIf="playerSuccessfullySubscribed()">El jugador se ha inscrito exitosamente</div>
+            <app-alert-soccer *ngFor="let alert of formAlerts" [text]="alert.text" [type]="alert.type" [show]="alert.validator"></app-alert-soccer>
             <button type="submit" class="form-button py-2 px-4 rounded mb-4 text-primary oxygen-bold main-bg-color hover:bg-green-600" [disabled]="!playerRequestForm.valid || loadingRequest()">Enviar</button>
         </form>  
     </div>

@@ -1,5 +1,6 @@
+import { AlertSoccerComponent } from '../alert-soccer/alert-soccer.component';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
 import { User } from '../../interfaces/user.interface';
@@ -9,11 +10,13 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [AlertSoccerComponent, CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
+  popOverInfo: any = {};
+  showPopOver = signal(null);
   loginService = inject(LoginService);
   router = inject(Router);
   loginForm = new FormGroup(
@@ -28,6 +31,19 @@ export class LoginComponent {
       )
     }
   );
+
+  constructor() {
+    effect(() => {
+      this.updatePopOver();
+    });
+  }
+  ngOnInit(): void {
+    this.popOverInfo = {
+      text: 'sdfsdfds',
+      type: '',
+      show: false
+    };
+  }
 
   onLogginSubmitRequest(event: Event) {
     const user: User = {
@@ -46,11 +62,36 @@ export class LoginComponent {
         
       },
       error: (error: HttpErrorResponse) => {
+        this.popOverInfo.show = true;
         if (error.status === 401) {
-          console.log('User unauthorized');
+          this.loginService.isLoggedIn.set(true);
+          this.loginService.isLoggedIn.set(false);
         }
+      },
+      complete: () => {
       }
     })
   }
 
+  updatePopOver() {
+      if (this.loginService.isLoggedIn()) {
+        this.popOverInfo = {
+          text: 'Loggin successfully',
+          type: 'success',
+          show: true && this.loginForm.touched
+        };
+      } else {
+        this.popOverInfo = {
+          text: 'User unauthorized 2',
+          type: 'error',
+          show: true && this.loginForm.touched
+        };
+      }
+      if (this.loginForm.touched) {
+        setTimeout(() => {
+          this.popOverInfo.show = false;
+          this.loginForm.reset();
+        }, 2000);
+      }
+  }
 }
